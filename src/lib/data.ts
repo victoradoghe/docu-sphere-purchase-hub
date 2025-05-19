@@ -1,4 +1,3 @@
-
 import { Project, Category, User, ProjectRequest } from '@/types';
 
 // Demo admin user
@@ -22,7 +21,7 @@ export const categories: Category[] = [
 ];
 
 // Demo projects
-export const projects: Project[] = [
+export let projects: Project[] = [
   {
     id: "proj-1",
     title: "Database Management Systems",
@@ -167,4 +166,9 @@ export const adminBankDetails = {
   accountName: "DocuSphere Academic Projects",
   accountNumber: "0123456789",
   bankName: "First Bank Nigeria"
+};
+
+// Function to update the projects array
+export const setProjects = (newProjects: Project[]) => {
+  projects = newProjects;
 };

@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Loader2, Trash2, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Loader2, Trash2, ShoppingCart, CheckCircle, AlertCircle } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import { getCurrentUser, addPurchasedProject } from '@/lib/auth';
 import { adminBankDetails } from '@/lib/data';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const CheckoutPage = () => {
   
   const [isConfirming, setIsConfirming] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [showPendingDialog, setShowPendingDialog] = useState(false);
   
   const currentUser = getCurrentUser();
   
@@ -34,25 +36,18 @@ const CheckoutPage = () => {
     
     setTimeout(() => {
       setIsConfirming(false);
-      setIsComplete(true);
-      
-      // Add projects to user's purchased projects
-      cart.forEach(item => {
-        addPurchasedProject(currentUser.id, item.projectId);
-      });
+      setShowPendingDialog(true);
       
       toast({
-        title: "Payment confirmed",
-        description: "Thank you for your purchase. You now have access to the full documents.",
+        title: "Payment submitted",
+        description: "Please wait while the admin confirms your payment.",
       });
-      
-      clearCart();
     }, 2000);
   };
   
   const totalAmount = calculateTotal();
   
-  if (cart.length === 0 && !isComplete) {
+  if (cart.length === 0 && !isComplete && !showPendingDialog) {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
@@ -193,6 +188,44 @@ const CheckoutPage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Payment Pending Dialog */}
+      <Dialog open={showPendingDialog} onOpenChange={(open) => {
+        // Prevent closing by clicking outside
+        if (!open && !isComplete) return;
+        setShowPendingDialog(open);
+      }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <AlertCircle className="h-5 w-5 mr-2 text-amber-500" />
+              Payment Pending Approval
+            </DialogTitle>
+            <DialogDescription>
+              Your payment is pending confirmation from the admin. Please wait while your transaction is being processed.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col space-y-4 py-4">
+            <div className="bg-muted p-4 rounded-md">
+              <p className="text-sm mb-2">
+                Your payment is awaiting approval. Once the admin confirms your payment, you will have access to the purchased project(s).
+              </p>
+              <p className="text-sm font-medium">
+                Please check back soon or contact us if you have any questions.
+              </p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setShowPendingDialog(false);
+                navigate('/');
+              }}
+            >
+              Return to Home
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

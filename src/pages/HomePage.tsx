@@ -55,55 +55,62 @@ const HomePage = () => {
       </section>
       
       {/* Featured Projects Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-bold">Featured Projects</h2>
-            <Button variant="ghost" onClick={() => navigate('/explore')}>
-              View All <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+      {featuredProjects.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center mb-8">
+              <h2 className="text-2xl font-bold">Featured Projects</h2>
+              <Button variant="ghost" onClick={() => navigate('/explore')}>
+                View All <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredProjects.map(project => (
+                <ProjectCard key={project.id} project={project} />
+              ))}
+            </div>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredProjects.map(project => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
       
       {/* Categories Section */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold mb-8">Browse by Category</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.slice(0, 6).map(category => (
-              <div key={category.id} className="bg-card rounded-lg overflow-hidden shadow-sm border">
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-4">{category.name}</h3>
-                  <ul className="space-y-2 mb-6">
-                    {getProjectsByCategory(category.id).map(project => (
-                      <li key={project.id} className="flex justify-between items-center">
-                        <span className="text-sm truncate">{project.title}</span>
-                        <span className="text-sm font-medium">₦{project.price.toLocaleString()}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => navigate(`/explore?category=${category.id}`)}
-                  >
-                    <BookOpen className="mr-2 h-4 w-4" />
-                    View All in {category.name}
-                  </Button>
-                </div>
-              </div>
-            ))}
+      {projects.length > 0 && (
+        <section className="py-16 bg-muted/50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-2xl font-bold mb-8">Browse by Category</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {categories.slice(0, 6).map(category => {
+                const categoryProjects = getProjectsByCategory(category.id);
+                return categoryProjects.length > 0 ? (
+                  <div key={category.id} className="bg-card rounded-lg overflow-hidden shadow-sm border">
+                    <div className="p-6">
+                      <h3 className="text-xl font-bold mb-4">{category.name}</h3>
+                      <ul className="space-y-2 mb-6">
+                        {categoryProjects.map(project => (
+                          <li key={project.id} className="flex justify-between items-center">
+                            <span className="text-sm truncate">{project.title}</span>
+                            <span className="text-sm font-medium">₦{project.price.toLocaleString()}</span>
+                          </li>
+                        ))}
+                      </ul>
+                      <Button 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => navigate(`/explore?category=${category.id}`)}
+                      >
+                        <BookOpen className="mr-2 h-4 w-4" />
+                        View All in {category.name}
+                      </Button>
+                    </div>
+                  </div>
+                ) : null;
+              }).filter(Boolean)}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
       
       {/* Request Project Section */}
       <section className="py-16">
