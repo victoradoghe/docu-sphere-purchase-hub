@@ -19,8 +19,13 @@ const LoginPage = () => {
   
   useEffect(() => {
     // Redirect if already logged in
-    if (getCurrentUser()) {
-      navigate('/');
+    const user = getCurrentUser();
+    if (user) {
+      if (user.isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     }
   }, [navigate]);
   
@@ -40,6 +45,7 @@ const LoginPage = () => {
     
     try {
       // Attempt login
+      console.log("Attempting login with:", email);
       const user = await login(email, password);
       
       if (user) {
@@ -48,10 +54,14 @@ const LoginPage = () => {
           description: `Welcome back, ${user.firstName}!`,
         });
         
+        console.log("Login successful, user:", user);
+        
         // Redirect to home or admin dashboard
         if (user.isAdmin) {
+          console.log("Redirecting to admin dashboard");
           navigate('/admin');
         } else {
+          console.log("Redirecting to home");
           navigate('/');
         }
       } else {
@@ -60,6 +70,7 @@ const LoginPage = () => {
           description: "Invalid email or password.",
           variant: "destructive"
         });
+        console.log("Login failed: user is null");
       }
     } catch (error) {
       toast({

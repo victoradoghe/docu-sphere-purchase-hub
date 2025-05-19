@@ -19,7 +19,7 @@ export const signup = async (
 ): Promise<User | null> => {
   try {
     // Check if email already exists
-    if (users.some(user => user.email === email)) {
+    if (users.some(user => user.email.toLowerCase() === email.toLowerCase())) {
       return null;
     }
 
@@ -41,7 +41,7 @@ export const signup = async (
       firstName,
       lastName,
       email,
-      isAdmin: email === "Kyrain@admin.com", // Check if it's the admin email
+      isAdmin: email.toLowerCase() === "kyrian@admin.com", // Case-insensitive admin check
       purchasedProjects: []
     };
 
@@ -60,8 +60,8 @@ export const signup = async (
 
 export const login = async (email: string, password: string): Promise<User | null> => {
   try {
-    // Check if it's the admin email (special case for demo)
-    const isAdminEmail = email === "Kyrain@admin.com";
+    // Check if it's the admin email (case-insensitive for reliability)
+    const isAdminEmail = email.toLowerCase() === "kyrian@admin.com";
     
     // Attempt to sign in using Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -80,11 +80,12 @@ export const login = async (email: string, password: string): Promise<User | nul
     if (isAdminEmail && password === "Kyrian@123") {
       currentUser = adminUser;
       localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      console.log("Admin login successful", currentUser);
       return adminUser;
     }
     
     // For regular users in the mock system
-    const user = users.find(user => user.email === email) || {
+    const user = users.find(user => user.email.toLowerCase() === email.toLowerCase()) || {
       id: data.user.id,
       firstName: email.split('@')[0],
       lastName: '',
