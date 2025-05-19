@@ -27,7 +27,7 @@ const SignupPage = () => {
     }
   }, [navigate]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
@@ -50,9 +50,9 @@ const SignupPage = () => {
     
     setIsSubmitting(true);
     
-    // Attempt signup
-    setTimeout(() => {
-      const newUser = signup(firstName, lastName, email, password);
+    try {
+      // Attempt signup and await the result
+      const newUser = await signup(firstName, lastName, email, password);
       
       if (newUser) {
         toast({
@@ -68,9 +68,17 @@ const SignupPage = () => {
           description: "An account with this email already exists.",
           variant: "destructive"
         });
-        setIsSubmitting(false);
       }
-    }, 1000);
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast({
+        title: "Signup failed",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
