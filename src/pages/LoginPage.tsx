@@ -24,7 +24,7 @@ const LoginPage = () => {
     }
   }, [navigate]);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email.trim() || !password.trim()) {
@@ -38,9 +38,9 @@ const LoginPage = () => {
     
     setIsSubmitting(true);
     
-    // Attempt login
-    setTimeout(() => {
-      const user = login(email, password);
+    try {
+      // Attempt login
+      const user = await login(email, password);
       
       if (user) {
         toast({
@@ -57,12 +57,20 @@ const LoginPage = () => {
       } else {
         toast({
           title: "Login failed",
-          description: "Invalid email or password. Note: For demo use the email 'admin@docusphere.com' to login as admin.",
+          description: "Invalid email or password.",
           variant: "destructive"
         });
-        setIsSubmitting(false);
       }
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Login failed",
+        description: "An error occurred during login. Please try again.",
+        variant: "destructive"
+      });
+      console.error("Login error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   return (
@@ -106,12 +114,6 @@ const LoginPage = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-            </div>
-            
-            <div className="text-xs text-muted-foreground">
-              <p>Demo Admin Login:</p>
-              <p>Email: admin@docusphere.com</p>
-              <p>Password: any password will work</p>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col">
